@@ -40,7 +40,8 @@ public class TagView extends RelativeLayout {
     private LayoutInflater mInflater;
     private OnTagClickListener mClickListener;
     private OnTagDeleteListener mDeleteListener;
-
+//For save state write parcable
+    private SparseBooleanArray mCheckedTagArray = new SparseBooleanArray();
     public TagView(Context context) {
         super(context, null);
         LogUtil.v(TAG,"[TagView]constructor 1");
@@ -146,6 +147,7 @@ public class TagView extends RelativeLayout {
             // inflate tag layout
             View tagLayout = mInflater.inflate(R.layout.tagview_item, null);
             tagLayout.setId(listIndex);
+		     mCheckedTagArray.put(position, false);
             tagLayout.setBackgroundDrawable(getSelector(tag));
             // tag text
             TextView tagView = (TextView) tagLayout.findViewById(R.id.tv_tag_item_contain);
@@ -159,8 +161,29 @@ public class TagView extends RelativeLayout {
             tagLayout.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mClickListener != null) {
-                        mClickListener.onTagClick(position, tag);
+                    //if (mClickListener != null) {
+                   //     mClickListener.onTagClick(position, tag);
+                  //  }
+			//For Mange Clickabe and Click Single mode Tag: 
+			 if (mClickListener != null && tagLayout.isEnabled() && tagLayout.isClickable()  ) {
+                        Tag mTag1 =getTags().get(position);
+                        if (!mCheckedTagArray.get(position)){
+
+                            for (int i = 0; i <mCheckedTagArray.size() ; i++) {
+                                if (mCheckedTagArray.get(i)){
+                                    mTag1.layoutColor= Color.BLUE;
+                                    getChildAt(i).setBackgroundDrawable(getSelector(mTag1));
+                                }
+                                mCheckedTagArray.put(i,false);
+                            }
+                            mCheckedTagArray.put(position, true);
+                            mTag1.layoutColor= Color.GREEN;
+                            tagLayout.setBackgroundDrawable(getSelector(mTag1));
+                        }
+
+
+                        mClickListener.onTagClick(position, mTag1);
+                       // invalidate();
                     }
                 }
             });
@@ -193,6 +216,11 @@ public class TagView extends RelativeLayout {
             } else {
                 deletableView.setVisibility(View.GONE);
             }
+		//For Clickable Layout Tag
+		if (!tag.clickable){
+                tagLayout.setEnabled(false);
+                tagLayout.setClickable(false);
+            }
             LayoutParams tagParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             //tagParams.setMargins(0, 0, 0, 0);
             //add margin of each line
@@ -200,6 +228,8 @@ public class TagView extends RelativeLayout {
             if (mWidth <= total + tagMargin + tagWidth + ResolutionUtil.dpToPx(this.getContext(), Constants.LAYOUT_WIDTH_OFFSET)) {
                 //need to add in new line
                 tagParams.addRule(RelativeLayout.BELOW, index_bottom);
+		    //For Support RTL Language 
+		     tagParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, index_header);
                 // initialize total param (layout padding left & layout padding right)
                 total = getPaddingLeft() + getPaddingRight();
                 index_bottom = listIndex;
@@ -207,6 +237,10 @@ public class TagView extends RelativeLayout {
             } else {
                 //no need to new line
                 tagParams.addRule(RelativeLayout.ALIGN_TOP, index_header);
+		        //For Support RTL Language 
+		    if (listIndex==1){
+                    tagParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, index_header);
+                }
                 //not header of the line
                 if (listIndex != index_header) {
                     tagParams.addRule(RelativeLayout.RIGHT_OF, listIndex - 1);
