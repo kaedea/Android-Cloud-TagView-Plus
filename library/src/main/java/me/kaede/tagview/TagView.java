@@ -248,9 +248,9 @@ public class TagView extends RelativeLayout {
         drawTags();
     }
 	
-    public void addTag(int index, Tag tag) {
+    public void addTag(int position, Tag tag) {
         LogUtil.v(TAG,"[addTag]");
-        mTags.add(index, tag);
+        mTags.add(position, tag);
         drawTags();
     }
 
@@ -284,6 +284,12 @@ public class TagView extends RelativeLayout {
     public void removeAllTags() {
         LogUtil.v(TAG,"[removeAllTags]");
         mTags.clear();
+        drawTags();
+    }
+
+    public void replaceTag(int position, Tag tag) {
+        LogUtil.v(TAG,"[replace]position = " + position);
+        mTags.set(position, tag);
         drawTags();
     }
 
