@@ -247,6 +247,12 @@ public class TagView extends RelativeLayout {
         mTags.add(tag);
         drawTags();
     }
+	
+    public void addTag(int index, Tag tag) {
+        LogUtil.v(TAG,"[addTag]");
+        mTags.add(index, tag);
+        drawTags();
+    }
 
     public void addTags(String[] tags) {
         LogUtil.v(TAG,"[addTags]");
